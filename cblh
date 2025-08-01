@@ -1,0 +1,41 @@
+#!/usr/bin/env dash
+
+src=$(basename "$0")
+
+# define colors
+c1="\033[1;31m"
+c2="\033[1;32m"
+c3="\033[1;33m"
+c4="\033[1;34m"
+c5="\033[1;35m"
+c6="\033[1;36m"
+c7="\033[1;37m"
+c="\033[0m"
+
+v="1-27"
+
+if [ -z "$1" ]; then
+	printf "${c1}$src: you need to pass num.${c}\n"
+else
+	case $1 in
+		l|lo)
+			echo "1"|tee /sys/class/backlight/intel_backlight/brightness
+		;;
+		h|hi)
+			echo "96000"|tee /sys/class/backlight/intel_backlight/brightness
+		;;
+		help|hp)
+			printf "$src $v\n"
+			printf "usage ... ${c7}$src ${c2}[num]${c}\n\n"
+			printf "${c2}l|lo${c} ... set brightness to least\n"
+			printf "${c2}h|hi${c} ... set brightness to max\n"
+			printf "${c2}help${c} ... print this\n"
+		;;
+		v|vn)
+			printf "$src $v\npart of the CuTils toolkit.\n"
+		;;
+		*)
+			echo $1|tee /sys/class/backlight/intel_backlight/brightness
+		;;
+	esac
+fi

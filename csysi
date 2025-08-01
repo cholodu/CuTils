@@ -1,0 +1,141 @@
+#!/usr/bin/env dash
+
+src=$(basename "$0")
+v="1.27b"
+
+# define colors
+c1="\033[1;31m"
+c2="\033[1;32m"
+c3="\033[1;33m"
+c4="\033[1;34m"
+c5="\033[1;35m"
+c6="\033[1;36m"
+c7="\033[1;37m"
+d1="\033[0;31m"
+d2="\033[0;32m"
+d3="\033[0;33m"
+d4="\033[0;34m"
+d5="\033[0;35m"
+d6="\033[0;36m"
+d7="\033[0;37m"
+c="\033[0m"
+
+genhelp(){
+	case $1 in
+		a)
+			# y8 2 copy
+			printf "usage ... $src ${c2}[protocol] ${c3}[action]${c}\n\n"
+			printf "bat ... refer to '${c7}$src ${c2}bat${c} ${c3}h${c}'\n"
+			printf "mem ... refer to '${c7}$src ${c2}mem${c} ${c3}h${c}'\n"
+		;;
+		m)
+			
+			printf "usage ... $src mem |a|m|u|help|\n\n"
+			printf "${c3}a|all${c} ... less /proc/meminfo\n"
+			printf "${c3}h|hel${c} ... print this\n"
+			printf "${c3}m|mem${c} ... print used memory + total + avail \n"
+			printf "${c3}u|use${c} ... print used memory\n"
+		;;
+		b)
+			printf "usage ... $src bat |a|b|c|help|\n\n"
+			printf "${c3}a|all${c} ... display uevent\n"
+			printf "${c3}b|bat${c} ... display battery percentage\n"
+			printf "${c3}c|cyc${c} ... display charge cycles\n"
+			printf "${c3}h|hel${c} ... print this\n"
+		;;
+		v)
+			printf "$src $v\npart of the CuTils toolkit.\n"
+		;;
+	esac
+
+}
+
+if [ -z "$1" ]; then
+	genhelp a; exit
+fi
+
+if [ "$1" = "bat"  ]; then
+	case $2 in
+		b|bat)
+			# adding color by n* cuz y not
+			if [ "$(cat /sys/class/power_supply/BAT*/capacity)" = "100" ]; then
+				printf "current battery percentage: ${d2}$(cat /sys/class/power_supply/BAT*/capacity)%%${c}\n"
+			elif [ "$(cat /sys/class/power_supply/BAT*/capacity)" -gt 30 ]; then
+				if [ "$(cat /sys/class/power_supply/BAT*/capacity)" -gt 70 ]; then
+					printf "current battery percentage: ${c2}$(cat /sys/class/power_supply/BAT*/capacity)%%${c}\n"
+				else
+					printf "current battery percentage: ${c3}$(cat /sys/class/power_supply/BAT*/capacity)%%${c}\n"
+				fi
+			elif [ "$(cat /sys/class/power_supply/BAT*/capacity)" -lt 30 ]; then
+				if [ "$(cat /sys/class/power_supply/BAT*/capacity)" -lt 20 ]; then
+					printf "current battery percentage: ${d1}$(cat /sys/class/power_supply/BAT*/capacity)%%${c}\n"
+				else
+					printf "current battery percentage: ${c1}$(cat /sys/class/power_supply/BAT*/capacity)%%${c}\n"
+				fi
+			elif [ "$(cat /sys/class/power_supply/BAT*/capacity)" -eq 30 ]; then
+				printf "current battery percentage: ${c3}$(cat /sys/class/power_supply/BAT*/capacity)%%${c}\n"
+			elif [ "$(cat /sys/class/power_supply/BAT*/capacity)" -eq 70 ]; then
+				printf "current battery percentage: ${c2}$(cat /sys/class/power_supply/BAT*/capacity)%%${c}\n"
+			else
+				printf "current battery percentage: $(cat /sys/class/power_supply/BAT*/capacity)%%\n"
+			fi
+
+			if [ "$(cat /sys/class/power_supply/BAT*/status)" = "Discharging" ]; then
+				printf "current state: ${c1}$(cat /sys/class/power_supply/BAT*/status)${c}\n"
+			elif [ "$(cat /sys/class/power_supply/BAT*/status)" = "Not charging" ]; then
+				printf "current state: ${c3}$(cat /sys/class/power_supply/BAT*/status)${c}\n"
+			elif [ "$(cat /sys/class/power_supply/BAT*/status)" = "Charging" ]; then
+				printf "current state: ${c2}$(cat /sys/class/power_supply/BAT*/status)${c}\n"
+			fi
+		;;
+		c|cyc)
+			printf "current charge cycles: $(cat /sys/class/power_supply/BAT*/cycle_count)\n"
+		;;
+		a|all)
+			printf "$(cat /sys/class/power_supply/BAT*/uevent)\n"
+		;;
+		hel|h)
+			genhelp b
+		;;
+		'')
+			printf "${c1}$src: please give an action, maybe this will help u${c}\n"
+			genhelp b
+		;;
+		*)
+			printf "${c1}$src: i would love to print ${c}${c3}$2${c1} but idk what that is${c}\n"
+		;;
+	esac
+elif [ "$1" = "mem" ]; then
+	case $2 in
+		u|use)
+			printf "${c7}$(cat /proc/meminfo|grep Active:)${c}\n"
+		;;
+		m|mem)
+			printf "${c7}$(cat /proc/meminfo|grep -Ei 'memtotal:')${c}\n"
+			printf "$(cat /proc/meminfo|grep -Ei 'memfree:')\n"
+			printf "${c7}$(cat /proc/meminfo|grep Active:)${c}\n"
+			printf "$(cat /proc/meminfo|grep Inactive:)\n"
+		;;
+		a|all)
+			cat -n /proc/meminfo|less
+		;;
+		h|hel)
+			genhelp m
+		;;
+		'')
+			printf "${c1}$src: please give an action, maybe this will help u${c}\n"
+			genhelp m
+		;;
+		*)
+			# wofi reference
+			printf "${c1}$src: i would love to print ${c}${c3}$2${c1} but idk what that is${c}\n"
+		;;
+	esac
+elif [ "$1" = "h" ] || [ -z "$1" ]; then
+	genhelp a
+elif [ "$1" = "v" ] || [ "$1" = "ver" ] || [ "$1" = "version" ]; then
+	genhelp v
+else
+	printf "${c1}$src: invalid protocol${c}\n"
+	genhelp a
+fi

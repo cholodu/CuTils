@@ -1,0 +1,69 @@
+#!/usr/bin/env dash
+#
+# cneth - internet handling for lazy people
+
+# dummy depchk
+
+#if [ -f /bin/sybau ]; then
+#	true
+#else
+#	if [ -f /usr/bin/sybau ]; then
+#		true
+#	else
+#		printf "sybau\n"; exit 1
+#	fi
+#fi
+
+src=$(basename "$0")
+
+# define colors
+c1="\033[1;31m"
+c2="\033[1;32m"
+c3="\033[1;33m"
+c4="\033[1;34m"
+c5="\033[1;35m"
+c6="\033[1;36m"
+c7="\033[1;37m"
+c="\033[0m"
+
+# checks 4 dhcpcd, runtime dep
+# gnna add udhcp support later
+if [ -f /usr/bin/dhcpcd ]; then
+	true
+else
+	if [ -f /bin/dhcpcd ]; then
+		true
+	else
+		printf "${c1}$src: i need dhcpcd to run.${c}\n"; exit 1
+	fi
+fi
+
+# checks 4 wpa_supplicant, runtime dep
+# not gnna check for w*_p* since im pretty sure they should be bundled
+if [ -f /usr/bin/wpa_supplicant ]; then
+	true
+else
+	if [ -f /bin/wpa_supplicant ]; then
+		true
+	else
+		printf "${c1}$src: i need wpa_supplicant to run.${c}\n"; exit 1
+	fi
+fi
+
+# my error handling exits every time a fail is caught because every fail is unrecoverable
+
+if [ $(id -u) -ne 0 ]; then
+	printf "${c1}$src: i need to be ran as root.${c}\n"&&exit 1
+fi
+
+if [ -z $1 ] || [ -z $2 ] || [ -z $3 ] || [ -z $4 ]; then
+	printf "${c1}$src: cannot continue; error parsing $ ${c}\n"
+else
+	modprobe -r "$3"
+	pkill dhcpcd
+	pkill wpa_supplicant
+	modprobe "$3"
+	ip link set $4 up
+	wpa_passphrase "$1" "$2"|tee /etc/wpa.conf&&wpa_supplicant -B -i $4 -c /etc/wpa.conf
+	dhcpcd $4 
+fi

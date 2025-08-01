@@ -1,0 +1,47 @@
+#!/usr/bin/env dash
+
+src=$(basename "$0")
+
+# define colors
+c1="\033[1;31m"
+c2="\033[1;32m"
+c3="\033[1;33m"
+c4="\033[1;34m"
+c5="\033[1;35m"
+c6="\033[1;36m"
+c7="\033[1;37m"
+c="\033[0m"
+
+v="0.01-27"
+
+case $1 in
+	mk)
+		if [ -z $2 ] || [ -z $3 ]; then
+			printf "${c1}$src: please pass the second &/or third operand(s)${c}\n"
+		else
+			echo "#!/bin/$3
+			
+			"|tee "$2"&&chmod +x "$2"
+			vim "$2"||nvim "$2"||nano "$2"||emacs "$2"
+		fi
+	;;
+	rm)
+		if [ -z $2 ]; then
+			printf "${c1}$0: please pass a second operand${c}\n"
+		else
+			rm -f /usr/bin/$2
+			rm -f /bin/$2
+		fi
+	;;
+	v|vn)
+	printf "$src $v\npart of the CuTils toolkit.\n"
+	;;
+	*|hl)
+		printf "${c7}$src${c} $v\n"
+		printf "usage ... ${c7}$src ${c2}mk ${c3}[filename] ${c4}[interpreter]${c}\n"
+		printf "usage ... ${c7}$src ${c2}rm ${c3}[filename]${c}\n\n"
+		printf "${c2}mk${c} ... make a executable\n"
+		printf "${c2}rm${c} ... remove a executable\n"
+		printf "${c2}hl${c} ... print this\n"
+	;;
+esac
