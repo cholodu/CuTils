@@ -12,7 +12,7 @@ c6="\033[1;36m"
 c7="\033[1;37m"
 c="\033[0m"
 
-v="1-27"
+v="1-30b"
 
 if [ -z "$1" ]; then
 	printf "${c1}$src: you need to pass num.${c}\n"
@@ -35,7 +35,7 @@ else
 			printf "$src $v\npart of the CuTils toolkit.\n"
 		;;
 		*)
-			echo $1|tee /sys/class/backlight/intel_backlight/brightness
+			(((echo $1|tee /sys/class/backlight/intel_backlight/brightness)||wsconsctl display.brightness="$1")||sysctl hw.acpi.video.lcd0.brightness="$1") >/dev/null 2>&1
 		;;
 	esac
 fi
