@@ -19,10 +19,10 @@ if [ -z "$1" ]; then
 else
 	case $1 in
 		l|lo)
-			echo "1"|tee /sys/class/backlight/intel_backlight/brightness
+			((echo "1"|tee /sys/class/backlight/intel_backlight/brightness)||(wsconsctl display.brightness="1"))||(sysctl hw.acpi.video.lcd0.brightness="1") >/dev/null 2>&1
 		;;
 		h|hi)
-			echo "96000"|tee /sys/class/backlight/intel_backlight/brightness
+			((echo "96000"|tee /sys/class/backlight/intel_backlight/brightness)||(wsconsctl display.brightness="100"))||(sysctl hw.acpi.video.lcd0.brightness="100") >/dev/null 2>&1
 		;;
 		help|hp)
 			printf "$src $v\n"
