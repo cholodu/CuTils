@@ -8,6 +8,5 @@
 - **csysi** ... a tool to view system info. currently only displays memory & battery related info
 
 ## dependencies ...
-- ... **dash** (not necessary, just change the interpreter to sh)
 - ... **basename** (not necessary, just for pretty $0 invoking)
 - ... **dhcpcd** & wpa_supplicant (runtime deps 4 cneth)
