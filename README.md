@@ -1,5 +1,6 @@
 # CuTils
-### sh/dash utilities for basic usage on linux
+### sh/dash utilities for basic usage on *linux*
+### BSD support is currently being added as august august 7.
 
 - **cblh** ... cblh is a simple backlight manager.
 - **cext** ... cext is a tool for creating executables (mostly shell)
