@@ -15,7 +15,7 @@ c="\033[0m"
 v="1-30b"
 
 if [ -z "$1" ]; then
-	printf "${c1}$src: you need to pass num.${c}\n"
+	printf "${c1}$src: you need to pass num.${c}\n"; exit 2
 else
 	case $1 in
 		l|lo)
